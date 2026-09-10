@@ -11,27 +11,29 @@ permissions:
 
 jobs:
   build:
-    runs-on: blacksmith-2vcpu-ubuntu-2204
+    runs-on: blacksmith-2vcpu-ubuntu-2404
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Docker builder
-        uses: useblacksmith/setup-docker-builder@v2
-
-      - name: Log in to GHCR
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push image
+      - name: Setup Blacksmith Docker Builder
+        uses: useblacksmith/setup-docker-builder@v2
+        with:
+          cache-key: yocrow-backend
+
+      - name: Build and Push Docker Image
         uses: useblacksmith/build-push-action@v2
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/yocrow-backend:staging
+            ghcr.io/${{ github.repository_owner }}/yocrow-backend:latest
             ghcr.io/${{ github.repository_owner }}/yocrow-backend:${{ github.sha }}
